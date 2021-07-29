@@ -6,11 +6,26 @@ api_url = "https://rvj6rnbpxj.execute-api.eu-central-1.amazonaws.com/prod"
 
 
 def query_live_data():
+    """Queries the live data from the eco API.
+
+    Returns:
+        JSON: The resulting json object, which contains the live data
+    """
     response = _query_website(f"{api_url}/live-data")
     return response.json()
 
 
 def query_building(interval: int, ts_start: int, ts_end: int):
+    """Queries the building data for a specific timeframe in a given interval length.
+
+    Args:
+        interval (int): The interval size in minutes
+        ts_start (int): The start timestamp in seconds since epoch
+        ts_end (int): The end timestamp in seconds since epoch
+
+    Returns:
+        JSON: The resulting json object, containing the aggregated values
+    """
     params = {"interval": interval, "begin-timestamp": ts_start,
               "end-timestamp": ts_end}
     params = urllib.parse.urlencode(params, quote_via=urllib.parse.quote)
@@ -21,6 +36,16 @@ def query_building(interval: int, ts_start: int, ts_end: int):
 
 
 def query_room(interval: int, ts_start: int, ts_end: int):
+    """Queries the room data for a specific timeframe in a given interval length.
+
+    Args:
+        interval (int): The interval size in minutes
+        ts_start (int): The start timestamp in seconds since epoch
+        ts_end (int): The end timestamp in seconds since epoch
+
+    Returns:
+        JSON: The resulting json object, containing the aggregated values
+    """
     params = {"interval": interval, "begin-timestamp": ts_start,
               "end-timestamp": ts_end}
     params = urllib.parse.urlencode(params, quote_via=urllib.parse.quote)
