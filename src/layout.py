@@ -24,16 +24,17 @@ def consumption_balance():
     ts_start = ts_end - (60 * 60 * 24)
 
     data = query_building(60, ts_start, ts_end)
+    interval_dates = [time.strftime('%H:%M', time.gmtime(ts_end - (e * 60 * 60))) for e in range(24)]
     interval_balance = [e['building']['totalPowerConsumption'] - e['building']['solarPowerOutput'] for e in data]
 
     figure = {
         'data': [
-            {'y': interval_balance, 'type': 'bar', 'name': 'SF'}
+            {'x': interval_dates, 'y': interval_balance, 'type': 'bar', 'name': 'SF'}
         ],
         'layout': {
-            'title': 'Stromverbrauch pro Stunde',
+            'title': 'Strom Balance der letzten 24 Stunden',
             'autosize': True,
-            'xaxis': { 'title': 'Stunde'},
+            'xaxis': { 'type': 'category' },
             'yaxis': { 'title': 'Verbrauch (kw/h)'}
         }
     }
