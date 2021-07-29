@@ -22,11 +22,9 @@ def consumption_balance():
     # @TODO Add balance target? Can't be zero during the night
 
     ts_end = int(time.time())
-    # There seems to be a bug in the api
-    # @TODO increase interval to show last 24 hours
-    ts_start = ts_end - (60 * 60)
+    ts_start = ts_end - (60 * 60 * 24)
 
-    data = query_building(10, ts_start, ts_end)
+    data = query_building(60, ts_start, ts_end)
     interval_balance = [e['building']['totalPowerConsumption'] - e['building']['solarPowerOutput'] for e in data]
 
     figure = {
@@ -43,6 +41,11 @@ def consumption_balance():
 
     return figure
 
+def current_room_balance():
+    data = query_live_data()
+
+    return data['building']['totalPowerConsumption'] - data['building']['powerConsumptionDataCenter']
+
 def build_layout(app):
     app.layout = html.Div(
         children=[
@@ -51,8 +54,9 @@ def build_layout(app):
                 children=[
                     dcc.Graph(
                         id="balance",
-                        figure=consumption_balance())
-                ,
+                        figure=consumption_balance()),
+                    html.H2(children="Aktueller Verbrauch durch Büroräume"),
+                    html.P(f"{current_room_balance():.2}"),                    
                     table.DataTable(
                         id='room_overview',
                         editable=False,
@@ -60,7 +64,7 @@ def build_layout(app):
                             ['Raum', 'In Ordnung', 'Probleme']],
                         data=df_room
                     )
-        ],
-            ),
+                ],
+            ),            
         ]
     )
