@@ -1,6 +1,5 @@
 import requests
 import urllib
-import sys
 
 api_url ="https://rvj6rnbpxj.execute-api.eu-central-1.amazonaws.com/prod"
 
