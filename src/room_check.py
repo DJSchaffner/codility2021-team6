@@ -15,6 +15,15 @@ class Room:
     sensors: dict
     workplaceReservations: int
 
+    def _check_light(self, end_time: int) -> (bool, list):
+        dt = datetime.fromtimestamp(end_time)
+
+        # Those hours should have sun outside all year
+        if dt > 8 and dt < 17 and self.sensors['lightOn'] and self.sensors['rollerBlindsClosed']:
+            return False, ["Licht ist an und Rolläden sind unten"]
+        else:
+            return True, []
+
     def _check_heater(self) -> (bool, list):
         if not self.sensors['heaterRunning']:
             return True, []
