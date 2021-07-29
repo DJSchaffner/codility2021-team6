@@ -39,7 +39,7 @@ def _query_website(url: str, params: dict=None, ignore_success: bool=False):
 
     if (not ignore_success) and (not _is_response_successful(response)):
         _print_response_error(response)
-        sys.exit()
+        return None
 
     return response
 
