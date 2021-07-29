@@ -6,7 +6,7 @@ api_url ="https://rvj6rnbpxj.execute-api.eu-central-1.amazonaws.com/prod"
 
 def query_live_data():
     response = _query_website(f"{api_url}/live-data")
-    return response.content
+    return response.json()
 
 def query_building(interval: int, ts_start: int, ts_end: int):
     params = {"interval": interval, "begin-timestamp": ts_start, "end-timestamp": ts_end}
@@ -14,7 +14,7 @@ def query_building(interval: int, ts_start: int, ts_end: int):
 
     response = _query_website(f"{api_url}/building", params)
 
-    return response.content
+    return response.json()
 
 def query_room(self, interval: int, ts_start: int, ts_end: int):
     params = {"interval": interval, "begin-timestamp": ts_start, "end-timestamp": ts_end}
@@ -22,7 +22,7 @@ def query_room(self, interval: int, ts_start: int, ts_end: int):
     
     response = _query_website(f"{api_url}/room", params)
 
-    return response.content
+    return response.json()
 
 def _query_website(url: str, params: dict=None, ignore_success: bool=False):
     """Query a website with the given headers.
