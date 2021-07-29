@@ -61,8 +61,26 @@ def build_layout(app):
                         id='room_overview',
                         editable=False,
                         columns=[{"name": i, "id": i} for i in
-                            ['Raum', 'In Ordnung', 'Probleme']],
-                        data=df_room
+                            ['Raum', 'Probleme']],
+                        data=df_room,
+                        style_cell={'textAlign': 'center'},
+                        style_as_list_view=True,
+                        style_data_conditional=[
+                            {
+                                'if': {
+                                    'filter_query': '{In Ordnung} != true',
+                                },
+                                'backgroundColor': 'tomato',
+                                'color': 'white'
+                            },
+                            {
+                                'if': {
+                                    'filter_query': '{In Ordnung} != false',
+                                },
+                                'backgroundColor': 'green',
+                                'color': 'white'
+                            }
+                        ]
                     )
                 ],
             ),            
