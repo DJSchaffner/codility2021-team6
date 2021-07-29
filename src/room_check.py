@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+import pandas as pd
+
 from api_access import query_live_data
 
 
@@ -41,12 +43,14 @@ class Room:
 
 
 def live_room_check():
-    problems = []
+    status = []
     json = query_live_data()
     rooms_json = json["rooms"]
     for r in rooms_json:
         room = Room(**r)
         check = room.check_sensors()
         if not check[0]:
-            problems.append((room.id, check[1]))
-    return problems
+            status.append({'Raum': room.id, 'In Ordnung': False, 'Probleme': check[1]})
+        else:
+            status.append({'Raum': room.id, 'In Ordnung': True, 'Probleme': ""})
+    return status

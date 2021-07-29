@@ -3,6 +3,16 @@ import dash_core_components as dcc
 import plotly.graph_objs as go
 import time
 
+import dash_table as table
+
+import pandas as pd
+
+from room_check import live_room_check
+
+# https://databraineo.com/ki-training-resources/python/interaktive-dashboards-in-python-plotly-dash-tutorial/
+
+df_room = live_room_check()
+
 from api_access import *
 
 # https://databraineo.com/ki-training-resources/python/interaktive-dashboards-in-python-plotly-dash-tutorial/
@@ -42,7 +52,15 @@ def build_layout(app):
                     dcc.Graph(
                         id="balance",
                         figure=consumption_balance())
-                ],
+                ,
+                    table.DataTable(
+                        id='room_overview',
+                        editable=False,
+                        columns=[{"name": i, "id": i} for i in
+                            ['Raum', 'In Ordnung', 'Probleme']],
+                        data=df_room
+                    )
+        ],
             ),
         ]
     )
