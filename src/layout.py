@@ -76,6 +76,7 @@ def build_layout(app):
     app.layout = html.Div(
         children=[
             html.H1(children="Codility Challenge 2021 - Group 6"),
+            html.H1(children="Building Eco Dashboard"),
             html.Div(
                 children=[
                     dcc.Graph(
@@ -123,6 +124,7 @@ def error_layout(app, error_text):
     app.layout = html.Div(
         children=[
             html.H1(children="Codility Challenge 2021 - Group 6"),
+            html.H1(children="Building Eco Dashboard"),
             html.P(children="Ein Fehler ist aufgetreten."),
             html.P(children=error_text)
         ]
