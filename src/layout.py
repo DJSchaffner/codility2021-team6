@@ -11,10 +11,11 @@ from api_access import *
 
 # https://databraineo.com/ki-training-resources/python/interaktive-dashboards-in-python-plotly-dash-tutorial/
 
-df_room = live_room_check()
-
+from api_access import *
 
 # https://databraineo.com/ki-training-resources/python/interaktive-dashboards-in-python-plotly-dash-tutorial/
+
+df_room = live_room_check()
 
 def consumption_balance():
     # @TODO Add coloring for hours that have negative balance?
@@ -79,7 +80,7 @@ def build_layout(app):
                         id='room_overview',
                         editable=False,
                         columns=[{"name": i, "id": i} for i in
-                            ['Raum', 'Probleme']],
+                            ['Raum', 'Problem(e)']],
                         data=df_room,
                         style_cell={'textAlign': 'center'},
                         style_as_list_view=True,

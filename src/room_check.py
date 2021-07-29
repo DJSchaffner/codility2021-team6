@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 
-import pandas as pd
+import itertools as it
+
+from datetime import datetime
 
 from api_access import query_live_data
 
@@ -13,44 +15,70 @@ class Room:
     sensors: dict
     workplaceReservations: int
 
-    def _check_heater(self) -> (bool, str):
+    def _check_heater(self) -> (bool, list):
         if not self.sensors['heaterRunning']:
-            return True, ""
+            return True, []
         if self.sensors['windowsOpen']:
-            return False, "Heater is running while window is open"
+            return False, ["Fenster ist offen, während die Heizung läuft"]
         if self.sensors['airConditioningRunning']:
-            return False, "Heater and air conditioning running at the same time"
-        return True, ""
+            return False, ["Klimaanlage und Heizung laufen beide"]
+        return True, []
 
-    def _check_aircon(self) -> (bool, str):
+    def _check_aircon(self) -> (bool, list):
         if not self.sensors['airConditioningRunning']:
-            return True, ""
+            return True, []
         if self.sensors['windowsOpen']:
-            return False, "Air conditioning is running while window is open"
+            return False, ["Fenster ist offen, während die Klimaanlage läuft"]
         if self.sensors['airConditioningRunning']:
-            return False, "Heater and air conditioning running at the same time"
-        return True, ""
+            return False, ["Klimaanlage und Heizung laufen beide"]
+        return True, []
 
-    def check_sensors(self) -> (bool, list):
+    def _check_room_free(self, end_time: int) -> (bool, list):
+        problems = []
+        if self.workplaceReservations > 0:
+            return True, []
+        if self.sensors['lightOn']:
+            problems.append("Keine Raumbuchung, aber Licht ist an")
+        if self.sensors['windowsOpen']:
+            problems.append("Keine Raumbuchung, aber Fenster ist offen")
+        if self.sensors['airConditioningRunning']:
+            problems.append("Keine Raumbuchung, aber Klimaanlage läuft")
+        if self.sensors['heaterRunning']:
+            if self.temperature > 18:
+                problems.append(
+                    "Keine Raumbuchung, aber wird auf über 18° Celsius geheizt")
+            else:
+                dt = datetime.fromtimestamp(end_time)
+                if (dt.hour >= 22 or dt.hour < 6) and self.temperature > 6:
+                    problems.append(
+                        "Raum wird nachts ohne Buchung auf "
+                        "über 6° Celsius geheizt")
+        return len(problems) == 0, problems
+
+    def check_sensors(self, end_time: int) -> (bool, list):
         heater = self._check_heater()
         ac = self._check_aircon()
-        if heater[0] and ac[0]:
+        free = self._check_room_free(end_time)
+        if heater[0] and ac[0] and free[0]:
             return True, []
         else:
-            problems = [heater[1], ac[1]]
-            problems = [p for p in problems if p != ""]
-            return False, list(dict.fromkeys(problems))
+            problems = [heater[1], ac[1], free[1]]
+            problems = list(it.chain(*problems))
+            return False, ', '.join(list(dict.fromkeys(problems)))
 
 
 def live_room_check():
     status = []
     json = query_live_data()
     rooms_json = json["rooms"]
+    end_time = json["samplingStopTime"]
     for r in rooms_json:
         room = Room(**r)
-        check = room.check_sensors()
+        check = room.check_sensors(end_time)
         if not check[0]:
-            status.append({'Raum': room.id, 'In Ordnung': False, 'Probleme': check[1]})
+            status.append(
+                {'Raum': room.id, 'In Ordnung': False, 'Problem(e)': check[1]})
         else:
-            status.append({'Raum': room.id, 'In Ordnung': True, 'Probleme': ""})
+            status.append(
+                {'Raum': room.id, 'In Ordnung': True, 'Problem(e)': "-"})
     return status
