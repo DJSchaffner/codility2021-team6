@@ -3,11 +3,8 @@ import time
 import dash_table as table
 import dash_html_components as html
 import dash_core_components as dcc
-import plotly.graph_objs as go
-import pandas as pd
 
 from room_check import live_room_check
-from api_access import *
 
 # https://databraineo.com/ki-training-resources/python/interaktive-dashboards-in-python-plotly-dash-tutorial/
 

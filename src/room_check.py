@@ -19,7 +19,8 @@ class Room:
         dt = datetime.fromtimestamp(end_time).hour
 
         # Those hours should have sun outside all year
-        if 8 < dt < 17 and self.sensors['lightOn'] and self.sensors['rollerBlindsClosed']:
+        if 8 < dt < 17 and self.sensors['lightOn'] and \
+                self.sensors['rollerBlindsClosed']:
             return False, ["Licht ist an und Rollläden sind unten"]
         else:
             return True, []
@@ -42,7 +43,8 @@ class Room:
             return False, ["Klimaanlage und Heizung laufen beide"]
         return True, []
 
-    def _check_room_free(self, end_time: int, num_employees_total: int) -> (bool, list):
+    def _check_room_free(self, end_time: int, num_employees_total: int) \
+            -> (bool, list):
         problems = []
         if num_employees_total > 0 and self.workplaceReservations > 0:
             return True, []
@@ -64,7 +66,8 @@ class Room:
                         "über 6° Celsius geheizt")
         return len(problems) == 0, problems
 
-    def check_sensors(self, end_time: int, num_employees_total: int) -> (bool, list):
+    def check_sensors(self, end_time: int, num_employees_total: int) \
+            -> (bool, list):
         heater = self._check_heater()
         ac = self._check_aircon()
         free = self._check_room_free(end_time, num_employees_total)
