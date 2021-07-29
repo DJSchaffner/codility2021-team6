@@ -27,10 +27,12 @@ def consumption_balance():
     data = query_building(60, ts_start, ts_end)
     interval_dates = [time.strftime('%H:%M', time.gmtime(ts_end - (e * 60 * 60))) for e in range(24)]
     interval_balance = [e['building']['totalPowerConsumption'] - e['building']['solarPowerOutput'] for e in data]
+    # @TODO get colors to display
+    #colors = ['green' if e < 0 else 'tomato' for e in interval_balance]
 
     figure = {
         'data': [
-            {'x': interval_dates, 'y': interval_balance, 'type': 'bar', 'name': 'SF'}
+            {'x': interval_dates, 'y': interval_balance, 'type': 'bar'}
         ],
         'layout': {
             'title': 'Strombilanz der letzten 24 Stunden',
