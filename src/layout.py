@@ -77,7 +77,8 @@ def build_layout(app):
                     html.H2(children="Aktueller Stromverbrauch durch Büroräume"),
                     html.P(f"{current_room_balance():.2f} kw/h"),    
                     html.H2(children="Aktueller Wasserverbrauch (10 min)"),
-                    html.P(f"{current_water_consumption():.2f} L ({('fallend', 'steigend')[current_water_consumption() > last_water_consumption()]})"),                       
+                    html.P(f"{current_water_consumption():.2f} L ({('fallend', 'steigend')[current_water_consumption() > last_water_consumption()]})"),
+                    html.H2(children="Raumübersicht"),
                     table.DataTable(
                         id='room_overview',
                         editable=False,
@@ -89,14 +90,14 @@ def build_layout(app):
                         style_data_conditional=[
                             {
                                 'if': {
-                                    'filter_query': '{In Ordnung} != true',
+                                    'filter_query': '{Problem(e)} != "-"',
                                 },
                                 'backgroundColor': 'tomato',
                                 'color': 'white'
                             },
                             {
                                 'if': {
-                                    'filter_query': '{In Ordnung} != false',
+                                    'filter_query': '{Problem(e)} = "-"',
                                 },
                                 'backgroundColor': 'green',
                                 'color': 'white'

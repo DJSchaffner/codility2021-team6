@@ -33,32 +33,32 @@ class Room:
             return False, ["Klimaanlage und Heizung laufen beide"]
         return True, []
 
-    def _check_room_free(self, end_time: int) -> (bool, list):
+    def _check_room_free(self, end_time: int, num_employees_total: int) -> (bool, list):
         problems = []
-        if self.workplaceReservations > 0:
+        if num_employees_total > 0 and self.workplaceReservations > 0:
             return True, []
         if self.sensors['lightOn']:
-            problems.append("Keine Raumbuchung, aber Licht ist an")
+            problems.append("Raum ist leer, aber Licht ist an")
         if self.sensors['windowsOpen']:
-            problems.append("Keine Raumbuchung, aber Fenster ist offen")
+            problems.append("Raum ist leer, aber Fenster ist offen")
         if self.sensors['airConditioningRunning']:
-            problems.append("Keine Raumbuchung, aber Klimaanlage läuft")
+            problems.append("Raum ist leer, aber Klimaanlage läuft")
         if self.sensors['heaterRunning']:
             if self.temperature > 18:
                 problems.append(
-                    "Keine Raumbuchung, aber wird auf über 18° Celsius geheizt")
+                    "Raum ist leer, aber wird auf über 18° Celsius geheizt")
             else:
                 dt = datetime.fromtimestamp(end_time)
                 if (dt.hour >= 22 or dt.hour < 6) and self.temperature > 6:
                     problems.append(
-                        "Raum wird nachts ohne Buchung auf "
+                        "Raum ist leer und wird nachts auf "
                         "über 6° Celsius geheizt")
         return len(problems) == 0, problems
 
-    def check_sensors(self, end_time: int) -> (bool, list):
+    def check_sensors(self, end_time: int, num_employees_total: int) -> (bool, list):
         heater = self._check_heater()
         ac = self._check_aircon()
-        free = self._check_room_free(end_time)
+        free = self._check_room_free(end_time, num_employees_total)
         if heater[0] and ac[0] and free[0]:
             return True, []
         else:
@@ -72,9 +72,10 @@ def live_room_check():
     json = query_live_data()
     rooms_json = json["rooms"]
     end_time = json["samplingStopTime"]
+    num_employees_total = json["building"]["totalEmployeesIn"]
     for r in rooms_json:
         room = Room(**r)
-        check = room.check_sensors(end_time)
+        check = room.check_sensors(end_time, num_employees_total)
         if not check[0]:
             status.append(
                 {'Raum': room.id, 'In Ordnung': False, 'Problem(e)': check[1]})
