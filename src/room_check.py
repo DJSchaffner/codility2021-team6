@@ -16,11 +16,11 @@ class Room:
     workplaceReservations: int
 
     def _check_light(self, end_time: int) -> (bool, list):
-        dt = datetime.fromtimestamp(end_time)
+        dt = datetime.fromtimestamp(end_time).hour
 
         # Those hours should have sun outside all year
-        if dt > 8 and dt < 17 and self.sensors['lightOn'] and self.sensors['rollerBlindsClosed']:
-            return False, ["Licht ist an und Rolläden sind unten"]
+        if 8 < dt < 17 and self.sensors['lightOn'] and self.sensors['rollerBlindsClosed']:
+            return False, ["Licht ist an und Rollläden sind unten"]
         else:
             return True, []
 
@@ -68,10 +68,11 @@ class Room:
         heater = self._check_heater()
         ac = self._check_aircon()
         free = self._check_room_free(end_time, num_employees_total)
-        if heater[0] and ac[0] and free[0]:
+        light = self._check_light(end_time)
+        if heater[0] and ac[0] and free[0] and light[0]:
             return True, []
         else:
-            problems = [heater[1], ac[1], free[1]]
+            problems = [heater[1], ac[1], free[1], light[1]]
             problems = list(it.chain(*problems))
             return False, ', '.join(list(dict.fromkeys(problems)))
 
