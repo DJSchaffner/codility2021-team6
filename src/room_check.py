@@ -16,6 +16,13 @@ class Room:
     workplaceReservations: int
 
     def _check_light(self, end_time: int) -> (bool, list):
+        """
+        Checks whether the lights in the building are running in daylight when
+        roller blinds are down
+        :param end_time: the end timestamp of the observed interval
+        :return: (True, []) if no problems with lighting were found,
+        (False, [list with problems]) otherwise
+        """
         dt = datetime.fromtimestamp(end_time).hour
 
         # Those hours should have sun outside all year
@@ -26,6 +33,12 @@ class Room:
             return True, []
 
     def _check_heater(self) -> (bool, list):
+        """
+        Checks whether heaters are running in rooms with open windows or
+        running air cons
+        :return: (True, []) if no problems with the heating were found,
+        (False, [list with problems]) otherwise
+        """
         if not self.sensors['heaterRunning']:
             return True, []
         if self.sensors['windowsOpen']:
@@ -35,6 +48,12 @@ class Room:
         return True, []
 
     def _check_aircon(self) -> (bool, list):
+        """
+        Checks whether air cons are running in rooms with open windows or
+        running heaters
+        :return: (True, []) if no problems with air cons were found,
+        (False, [list with problems]) otherwise
+        """
         if not self.sensors['airConditioningRunning']:
             return True, []
         if self.sensors['windowsOpen']:
@@ -45,6 +64,14 @@ class Room:
 
     def _check_room_free(self, end_time: int, num_employees_total: int) \
             -> (bool, list):
+        """
+        Checks whether empty rooms are unnecessarily heated, have lights or
+        air cons running or have open windows
+        :param end_time: the end timestamp of the observed interval
+        :param num_employees_total: the number of employees in the building
+        :return: (True, []) if no problems with empty rooms were found,
+        (False, [list with problems]) otherwise
+        """
         problems = []
         if num_employees_total > 0 and self.workplaceReservations > 0:
             return True, []
@@ -68,6 +95,13 @@ class Room:
 
     def check_sensors(self, end_time: int, num_employees_total: int) \
             -> (bool, list):
+        """
+        Checks the sensors of a room for problems
+        :param end_time: the end timestamp of the observed interval
+        :param num_employees_total: the number of employees in the building
+        :return: (True, []) if no problems were found for the room,
+        (False, [list with problems]) otherwise
+        """
         heater = self._check_heater()
         ac = self._check_aircon()
         free = self._check_room_free(end_time, num_employees_total)
@@ -81,6 +115,11 @@ class Room:
 
 
 def live_room_check():
+    """
+    Checks all rooms in the building for currently occurring problems
+    :return: the list of rooms with a dict containing for each room whether and
+    which problems occur
+    """
     status = []
     json = query_live_data()
     rooms_json = json["rooms"]
