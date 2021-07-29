@@ -1,19 +1,18 @@
-import dash_html_components as html
-import dash_core_components as dcc
-import plotly.graph_objs as go
 import time
 
 import dash_table as table
-
+import dash_html_components as html
+import dash_core_components as dcc
+import plotly.graph_objs as go
 import pandas as pd
 
 from room_check import live_room_check
+from api_access import *
 
 # https://databraineo.com/ki-training-resources/python/interaktive-dashboards-in-python-plotly-dash-tutorial/
 
 df_room = live_room_check()
 
-from api_access import *
 
 # https://databraineo.com/ki-training-resources/python/interaktive-dashboards-in-python-plotly-dash-tutorial/
 
@@ -34,8 +33,8 @@ def consumption_balance():
         'layout': {
             'title': 'Stromverbrauch pro Stunde',
             'autosize': True,
-            'xaxis': { 'title': 'Stunde', 'autorange': False},
-            'yaxis': { 'title': 'Verbrauch'}
+            'xaxis': { 'title': 'Stunde'},
+            'yaxis': { 'title': 'Verbrauch (kw/h)'}
         }
     }
 
