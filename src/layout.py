@@ -32,7 +32,7 @@ def consumption_balance():
             {'x': interval_dates, 'y': interval_balance, 'type': 'bar', 'name': 'SF'}
         ],
         'layout': {
-            'title': 'Strom Balance der letzten 24 Stunden',
+            'title': 'Strombilanz der letzten 24 Stunden',
             'autosize': True,
             'xaxis': { 'type': 'category' },
             'yaxis': { 'title': 'Verbrauch (kw/h)'}
@@ -46,6 +46,22 @@ def current_room_balance():
 
     return data['building']['totalPowerConsumption'] - data['building']['powerConsumptionDataCenter']
 
+def current_water_consumption():
+    ts_end = int(time.time())
+    ts_start = ts_end - (60 * 10)
+
+    data = query_building(10, ts_start, ts_end)
+
+    return data[0]['building']['waterConsumption']
+
+def last_water_consumption():
+    ts_end = int(time.time()) - (60 * 10)
+    ts_start = ts_end - (60 * 10)
+
+    data = query_building(10, ts_start, ts_end)
+
+    return data[0]['building']['waterConsumption']
+
 def build_layout(app):
     app.layout = html.Div(
         children=[
@@ -53,10 +69,12 @@ def build_layout(app):
             html.Div(
                 children=[
                     dcc.Graph(
-                        id="balance",
+                        id="power_balance",
                         figure=consumption_balance()),
-                    html.H2(children="Aktueller Verbrauch durch Büroräume"),
-                    html.P(f"{current_room_balance():.2}"),                    
+                    html.H2(children="Aktueller Stromverbrauch durch Büroräume"),
+                    html.P(f"{current_room_balance():.2f} kw/h"),    
+                    html.H2(children="Aktueller Wasserverbrauch (10 min)"),
+                    html.P(f"{current_water_consumption():.2f} L ({('fallend', 'steigend')[current_water_consumption() > last_water_consumption()]})"),                       
                     table.DataTable(
                         id='room_overview',
                         editable=False,
